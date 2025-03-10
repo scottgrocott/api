@@ -28,7 +28,7 @@ app.use(bodyParser.json(),cors());
   
   // Import Models
   const Patch = gr55Db.model('Patch', require('../models/patch').schema, 'patches');
-  const Path = metalThroneDb.model('Path', require('../models/Path').schema, 'paths');
+  const Path = metalThroneDb.model('Path', require('../models/path').schema, 'paths');
 
 // CRUD Routes for Patches
 
