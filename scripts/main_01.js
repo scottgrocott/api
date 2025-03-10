@@ -9,13 +9,13 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.json(),cors());
 
-// MongoDB Connection for gr55_navigator
-mongoose.connect('mongodb://localhost/gr55_navigator', {
 
-  })
-    .then(() => console.log('Connected to MongoDB (gr55_navigator)'))
-    .catch(err => console.error('MongoDB (gr55_navigator) connection error:', err));
   
+  // MongoDB Connection for metal_throne
+  const gr55Db = mongoose.createConnection('mongodb://localhost/gr55_navigator', {
+
+  });
+
   // MongoDB Connection for metal_throne
   const metalThroneDb = mongoose.createConnection('mongodb://localhost/metal_throne', {
 
@@ -24,7 +24,7 @@ mongoose.connect('mongodb://localhost/gr55_navigator', {
   metalThroneDb.on('error', err => console.error('MongoDB (metal_throne) connection error:', err));
   
   // Import Models
-  const Patch = mongoose.model('Patch', require('../models/Patch').schema, 'patches');
+  const Patch = gr55Db.model('Patch', require('../models/Patch').schema, 'patches');
   const Path = metalThroneDb.model('Path', require('../models/Path').schema, 'paths');
 
 // CRUD Routes for Patches
