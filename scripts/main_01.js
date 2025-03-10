@@ -16,6 +16,9 @@ app.use(bodyParser.json(),cors());
 
   });
 
+  gr55Db.on('connected', () => console.log('Connected to MongoDB (gr55_navigator)'));
+  gr55Db.on('error', err => console.error('MongoDB (gr55_navigator) connection error:', err));
+
   // MongoDB Connection for metal_throne
   const metalThroneDb = mongoose.createConnection('mongodb://localhost/metal_throne', {
 
@@ -24,7 +27,7 @@ app.use(bodyParser.json(),cors());
   metalThroneDb.on('error', err => console.error('MongoDB (metal_throne) connection error:', err));
   
   // Import Models
-  const Patch = gr55Db.model('Patch', require('../models/Patch').schema, 'patches');
+  const Patch = gr55Db.model('Patch', require('../models/patch').schema, 'patches');
   const Path = metalThroneDb.model('Path', require('../models/Path').schema, 'paths');
 
 // CRUD Routes for Patches
