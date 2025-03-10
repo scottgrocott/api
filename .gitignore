@@ -1,0 +1,13 @@
+.env
+node_modules/
+*.log
+index.html
+index_01.html
+crud.js
+gemini.js
+grok.js
+openai.js
+bot_01.js
+bot_02.js
+bot_03.js
+index.php

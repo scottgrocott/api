@@ -1,0 +1,20 @@
+{
+  "name": "metal_throne_api",
+  "version": "1.0.0",
+  "description": "Metal Throne bot APIs for Machine Hub",
+  "main": "index.js",
+  "scripts": {
+    "start-bot-01": "node bots/bot_01.js",
+    "start-bot-02": "node bots/bot_02.js",
+    "start-bot-03": "node bots/bot_03.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.22.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.85.4"
+  }
+}
