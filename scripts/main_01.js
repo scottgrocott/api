@@ -5,19 +5,27 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const mdb_uri = process.env.MONGODB_GR55_URI || 'mongodb://localhost/gr55_navigator';
+//const mdb_uri = process.env.MONGODB_GR55_URI || 'mongodb://localhost/gr55_navigator';
 // Middleware
 app.use(bodyParser.json(),cors());
 
-// MongoDB Connection
-mongoose.connect(mdb_uri, {
+// MongoDB Connection for gr55_navigator
+mongoose.connect('mongodb://localhost/gr55_navigator', {
 
-})
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  })
+    .then(() => console.log('Connected to MongoDB (gr55_navigator)'))
+    .catch(err => console.error('MongoDB (gr55_navigator) connection error:', err));
+  
+  // MongoDB Connection for metal_throne
+  const metalThroneDb = mongoose.createConnection('mongodb://localhost/metal_throne', {
 
-// Import Patch Model
-const Patch = require('../models/patch');
+  });
+  metalThroneDb.on('connected', () => console.log('Connected to MongoDB (metal_throne)'));
+  metalThroneDb.on('error', err => console.error('MongoDB (metal_throne) connection error:', err));
+  
+  // Import Models
+  const Patch = mongoose.model('Patch', require('../models/Patch').schema, 'patches');
+  const Path = metalThroneDb.model('Path', require('../models/Path').schema, 'paths');
 
 // CRUD Routes for Patches
 
@@ -80,6 +88,84 @@ app.delete('/api/v1/gr55/presets/:id', async (req, res) => {
     res.status(500).json({ message: 'Error deleting patch', error });
   }
 });
+
+// CRUD Routes for Metal Throne Paths
+
+// CREATE - Add a new path
+app.post('/api/v1/metal_throne/paths', async (req, res) => {
+    try {
+      const {
+        map_id, property, from, to, dur, dir, easing,
+        startEvents, pauseEvents, resumeEvents, elasticity, delay
+      } = req.body;
+      const newPath = new Path({
+        map_id, property, from, to, dur, dir, easing,
+        startEvents, pauseEvents, resumeEvents, elasticity, delay
+      });
+      const savedPath = await newPath.save();
+      res.status(201).json(savedPath);
+    } catch (error) {
+      res.status(400).json({ message: 'Error creating path', error });
+    }
+  });
+  
+  // READ - Get all paths
+  app.get('/api/v1/metal_throne/paths', async (req, res) => {
+    try {
+      const paths = await Path.find();
+      res.json(paths);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching paths', error });
+    }
+  });
+  
+  // READ - Get a specific path by ID
+  app.get('/api/v1/metal_throne/paths/:id', async (req, res) => {
+    try {
+      const path = await Path.findById(req.params.id);
+      if (!path) return res.status(404).json({ message: 'Path not found' });
+      res.json(path);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching path', error });
+    }
+  });
+  
+  // UPDATE - Update a path by ID
+  app.put('/api/v1/metal_throne/paths/:id', async (req, res) => {
+    try {
+      const {
+        map_id, property, from, to, dur, dir, easing,
+        startEvents, pauseEvents, resumeEvents, elasticity, delay
+      } = req.body;
+      const path = await Path.findByIdAndUpdate(
+        req.params.id,
+        {
+          map_id, property, from, to, dur, dir, easing,
+          startEvents, pauseEvents, resumeEvents, elasticity, delay
+        },
+        { new: true, runValidators: true }
+      );
+      if (!path) return res.status(404).json({ message: 'Path not found' });
+      res.json(path);
+    } catch (error) {
+      res.status(400).json({ message: 'Error updating path', error });
+    }
+  });
+  
+  // DELETE - Delete a path by ID
+  app.delete('/api/v1/metal_throne/paths/:id', async (req, res) => {
+    try {
+      const path = await Path.findByIdAndDelete(req.params.id);
+      if (!path) return res.status(404).json({ message: 'Path not found' });
+      res.json({ message: 'Path deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Error deleting path', error });
+    }
+  });
+
+
+
+
 
 // Start Server
 app.listen(PORT, () => {
