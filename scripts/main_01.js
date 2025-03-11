@@ -121,7 +121,19 @@ app.post('/api/v1/metal_throne/paths', async (req, res) => {
       res.status(500).json({ message: 'Error fetching paths', error });
     }
   });
+  // READ - Get all paths by 'from' value
+app.get('/api/v1/metal_throne/paths/from/:fromValue', async (req, res) => {
+    try {
+      const fromValue = req.params.fromValue; // e.g., "0 0 0"
+      const paths = await Path.find({ from: fromValue });
+      if (paths.length === 0) return res.status(404).json({ message: 'No paths found with the specified "from" value' });
+      res.json(paths);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching paths by "from" value', error });
+    }
+  });
   
+
   // READ - Get a specific path by ID
   app.get('/api/v1/metal_throne/paths/:id', async (req, res) => {
     try {
