@@ -112,24 +112,32 @@ app.post('/api/v1/metal_throne/paths', async (req, res) => {
     }
   });
   
-  // READ - Get all paths
-  app.get('/api/v1/metal_throne/paths', async (req, res) => {
+// READ - Get all paths filtered by map_id (optional query parameter)
+app.get('/api/v1/metal_throne/paths', async (req, res) => {
     try {
-      const paths = await Path.find();
+      const { map_id } = req.query; // Extract map_id from query parameters
+      let query = {};
+      if (map_id) {
+        query.map_id = map_id; // Filter by map_id if provided
+      }
+      const paths = await Path.find(query);
+      if (paths.length === 0) {
+        return res.status(404).json({ message: map_id ? `No paths found for map_id "${map_id}"` : 'No paths found' });
+      }
       res.json(paths);
     } catch (error) {
       res.status(500).json({ message: 'Error fetching paths', error });
     }
   });
-  // READ - Get all paths by 'from' value
-app.get('/api/v1/metal_throne/paths/from/:fromValue', async (req, res) => {
+// READ - Get all paths by 'map_id' and 'from' value
+app.get('/api/v1/metal_throne/paths/map/:mapId/from/:fromValue', async (req, res) => {
     try {
-      const fromValue = req.params.fromValue; // e.g., "0 0 0"
-      const paths = await Path.find({ from: fromValue });
-      if (paths.length === 0) return res.status(404).json({ message: 'No paths found with the specified "from" value' });
+      const { mapId, fromValue } = req.params; // Extract mapId and fromValue from URL parameters
+      const paths = await Path.find({ map_id: mapId, from: fromValue });
+      if (paths.length === 0) return res.status(404).json({ message: 'No paths found with the specified "map_id" and "from" value' });
       res.json(paths);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching paths by "from" value', error });
+      res.status(500).json({ message: 'Error fetching paths by "map_id" and "from" value', error });
     }
   });
   
